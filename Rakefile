@@ -1,3 +1,5 @@
+require 'bundler/gem_tasks'
+
 require 'rake'
 
 require 'rake/clean'
@@ -28,4 +30,15 @@ begin
   task :test => :spec
 rescue LoadError
   puts "Warning: unable to load rspec tasks"
+end
+
+# Monkey patch Bundler gem_helper so we release to our gem server instead of rubygems.org
+module Bundler
+  class GemHelper
+    def rubygem_push(path)
+      gem_server_url = 'http://gems.virginia.hoopla:9292'
+      sh("gem inabox '#{path}' --host #{gem_server_url}")
+      Bundler.ui.confirm "Pushed #{name} #{version} to #{gem_server_url}"
+    end
+  end
 end
