@@ -3,19 +3,13 @@ require 'bundler/gem_tasks'
 require 'rake'
 
 require 'rake/clean'
-require 'rake/packagetask'
 require 'yard'
 require 'yard/rake/yardoc_task'
 
-require 'fileutils'
-include FileUtils
-
-# Default Rake task is to run all tests
-task :default => :test
 CLEAN << Rake::FileList['doc/**', '.yardoc']
-#Yard
+# Yard
 YARD::Rake::YardocTask.new do |t|
-  t.files   = ['lib/**/*.rb']   # optional
+  t.files   = ['lib/**/*.rb'] # optional
   t.options = ['--title', 'CookieJar, a HTTP Client Cookie Parsing Library',
                '--main', 'README.markdown', '--files', 'LICENSE']
 end
@@ -24,12 +18,12 @@ begin
   require 'rspec/core/rake_task'
 
   RSpec::Core::RakeTask.new do |t|
-#    t.libs << 'lib'
-#    t.pattern = 'test/**/*_test.rb'
+    t.ruby_opts = %w(-w)
+    t.pattern = 'spec/**/*_spec.rb'
   end
-  task :test => :spec
+  task test: :spec
 rescue LoadError
-  puts "Warning: unable to load rspec tasks"
+  puts 'Warning: unable to load rspec tasks'
 end
 
 # Monkey patch Bundler gem_helper so we release to our gem server instead of rubygems.org
@@ -42,3 +36,6 @@ module Bundler
     end
   end
 end
+
+# Default Rake task is to run all tests
+task default: :test
